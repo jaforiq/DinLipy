@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -9,13 +9,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-car-booking',
@@ -33,6 +32,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
   styleUrl: './car-booking.component.css',
 })
 export class CarBookingComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
   bookingForm!: FormGroup;
   minDate = new Date();
 
@@ -46,7 +46,11 @@ export class CarBookingComponent implements OnInit {
     { label: 'S', value: 'saturday' },
   ];
 
-  constructor(private fb: FormBuilder, private dateAdapter: DateAdapter<Date>) {
+  constructor(
+    private fb: FormBuilder,
+    private dateAdapter: DateAdapter<Date>,
+    private router: Router
+  ) {
     this.dateAdapter.setLocale('en-GB');
   }
 
@@ -116,8 +120,9 @@ export class CarBookingComponent implements OnInit {
 
   onSubmit() {
     if (this.bookingForm.valid) {
-      console.log(this.bookingForm.value);
+      console.log('Form data:', this.bookingForm.value);
       // Handle form submission
+      this.router.navigate(['/']);
     } else {
       this.markFormGroupTouched(this.bookingForm);
     }
@@ -133,6 +138,7 @@ export class CarBookingComponent implements OnInit {
   }
 
   onClose() {
-    // Handle modal close
+    //closeBookingModal();
+    this.close.emit();
   }
 }
