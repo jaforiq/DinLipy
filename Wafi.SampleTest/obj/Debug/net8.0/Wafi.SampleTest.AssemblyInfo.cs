@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Wafi.SampleTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21c018b9d5c0a28ef4fc963ba2e820988c514b8f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+61c8c68e7f0dee37b5d8fd6f79fa783f5bd89996")]
 [assembly: System.Reflection.AssemblyProductAttribute("Wafi.SampleTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Wafi.SampleTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

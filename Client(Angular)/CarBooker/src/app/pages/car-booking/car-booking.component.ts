@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -8,13 +7,16 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { Router } from '@angular/router';
+import { Car } from '../../interfaces/Car';
 import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Router } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { CarService } from '../../services/carServices/car.service';
 
 @Component({
   selector: 'app-car-booking',
@@ -33,6 +35,8 @@ import { Router } from '@angular/router';
 })
 export class CarBookingComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
+  @Input() cars: Car[] = [];
+
   bookingForm!: FormGroup;
   minDate = new Date();
 
@@ -49,7 +53,8 @@ export class CarBookingComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private dateAdapter: DateAdapter<Date>,
-    private router: Router
+    private router: Router,
+    private carService: CarService
   ) {
     this.dateAdapter.setLocale('en-GB');
   }
@@ -118,11 +123,65 @@ export class CarBookingComponent implements OnInit {
     return field ? field.invalid && (field.dirty || field.touched) : false;
   }
 
+  // onSubmit() {
+  //   if (this.bookingForm.valid) {
+  //     console.log('Form data:', this.bookingForm.value);
+  //     // Handle form submission
+
+  //     this.router.navigate(['/']);
+  //   } else {
+  //     this.markFormGroupTouched(this.bookingForm);
+  //   }
+  // }
+
   onSubmit() {
     if (this.bookingForm.valid) {
-      console.log('Form data:', this.bookingForm.value);
-      // Handle form submission
-      this.router.navigate(['/']);
+      const formData = this.bookingForm.value;
+
+      // Convert date fields to YYYY-MM-DD
+      const formatDate = (date: Date) => date.toISOString().split('T')[0];
+
+      // Convert time fields to HH:mm:ss
+      const formatTime = (time: string) => `${time}:00`;
+
+      // Convert weekday selections into a bitwise flag (Sunday = 1, Monday = 2, ..., Saturday = 64)
+      const repeatDays = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+      ];
+      let daysToRepeatOn = 0;
+      repeatDays.forEach((day, index) => {
+        if (formData[day]) daysToRepeatOn |= 1 << index;
+      });
+
+      // Construct the final data object
+      const bookingPayload = {
+        bookingDate: formatDate(new Date(formData.bookingDate)),
+        startTime: formatTime(formData.startTime),
+        endTime: formatTime(formData.endTime),
+        repeatOption: formData.repeatFrequency === 'weekly' ? 1 : 0,
+        daysToRepeatOn: daysToRepeatOn,
+        requestedOn: new Date().toISOString(),
+        carId: formData.car,
+      };
+
+      console.log('Formatted Booking Data:', bookingPayload); // Debugging
+
+      // Send data to the API
+      this.carService.bookCar(bookingPayload).subscribe(
+        (response) => {
+          console.log('Booking successful:', response);
+          this.router.navigate(['/']); // Redirect on success
+        },
+        (error) => {
+          console.error('Booking failed:', error);
+        }
+      );
     } else {
       this.markFormGroupTouched(this.bookingForm);
     }

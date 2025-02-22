@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
+import { Car } from '../../interfaces/Car';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { BrowserModule } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CarService } from '../../services/carServices/car.service';
 import { CalendarComponent } from '../../component/calendar/calendar.component';
 import { CarBookingComponent } from '../car-booking/car-booking.component';
 
@@ -22,6 +22,20 @@ import { CarBookingComponent } from '../car-booking/car-booking.component';
 })
 export class HomeComponent {
   showBookingModal = false;
+  cars: Car[] = [];
+
+  constructor(private carService: CarService) {}
+
+  ngOnInit() {
+    this.loadCars();
+  }
+
+  loadCars() {
+    this.carService.getCars().subscribe(
+      (cars) => (this.cars = cars),
+      (error) => console.error('Error fetching cars:', error)
+    );
+  }
 
   openBookingModal() {
     this.showBookingModal = true;
