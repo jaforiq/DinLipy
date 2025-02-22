@@ -176,7 +176,8 @@ export class CarBookingComponent implements OnInit {
       this.carService.bookCar(bookingPayload).subscribe(
         (response) => {
           console.log('Booking successful:', response);
-          this.router.navigate(['/']); // Redirect on success
+          //this.router.navigate(['/']); // Redirect on success
+          this.onClose();
         },
         (error) => {
           console.error('Booking failed:', error);
